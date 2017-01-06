@@ -39,7 +39,7 @@ using namespace Avogadro::QtGui;
 
 CopyPaste::CopyPaste(QObject *parent_) :
   Avogadro::QtGui::ExtensionPlugin(parent_),
-  m_pastedFormat(NULL),
+  m_pastedFormat(nullptr),
   m_copyAction(new QAction(tr("Copy"), this)),
   m_cutAction(new QAction(tr("Cut"), this)),
   m_clearAction(new QAction(tr("Clear"), this)),
@@ -139,7 +139,7 @@ void CopyPaste::paste()
   // Delete any old clipboard data.
   if (m_pastedFormat) {
     delete m_pastedFormat;
-    m_pastedFormat = NULL;
+    m_pastedFormat = nullptr;
     m_pastedData.clear();
   }
 
@@ -194,9 +194,10 @@ void CopyPaste::paste()
 
   // insert mol into m_molecule
   m_molecule->undoMolecule()->appendMolecule(mol, "Paste Molecule");
+  emit requestActiveTool("Manipulator");
 
   delete m_pastedFormat;
-  m_pastedFormat = NULL;
+  m_pastedFormat = nullptr;
   m_pastedData.clear();
 }
 

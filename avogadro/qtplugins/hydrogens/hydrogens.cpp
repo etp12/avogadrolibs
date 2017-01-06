@@ -29,18 +29,18 @@ namespace QtPlugins {
 
 Hydrogens::Hydrogens(QObject *parent_) :
   Avogadro::QtGui::ExtensionPlugin(parent_),
-  m_molecule(NULL)
+  m_molecule(nullptr)
 {
-  QAction *action = new QAction(tr("Adjust &Hydrogens (Add and Remove)"), this);
+  QAction *action = new QAction(tr("&Adjust Hydrogens"), this);
   action->setShortcut(QKeySequence("Ctrl+Alt+H"));
   connect(action, SIGNAL(triggered()), SLOT(adjustHydrogens()));
   m_actions.append(action);
 
-  action = new QAction(tr("Adjust Hydrogens (&Add Only)"), this);
+  action = new QAction(tr("Add Hydrogens"), this);
   connect(action, SIGNAL(triggered()), SLOT(addHydrogens()));
   m_actions.append(action);
 
-  action = new QAction(tr("Adjust Hydrogens (&Remove Only)"), this);
+  action = new QAction(tr("Remove E&xtra Hydrogens"), this);
   connect(action, SIGNAL(triggered()), SLOT(removeHydrogens()));
   m_actions.append(action);
 
@@ -65,7 +65,7 @@ QList<QAction *> Hydrogens::actions() const
 
 QStringList Hydrogens::menuPath(QAction *) const
 {
-  return QStringList() << tr("&Edit");
+  return QStringList() << tr("&Build") << tr("&Hydrogens");
 }
 
 void Hydrogens::setMolecule(QtGui::Molecule *mol)

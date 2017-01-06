@@ -28,7 +28,7 @@ namespace QtPlugins {
 
 CustomElements::CustomElements(QObject *parent_) :
   Avogadro::QtGui::ExtensionPlugin(parent_),
-  m_molecule(NULL),
+  m_molecule(nullptr),
   m_reassignAction(new QAction(tr("Reassign &Custom Elements..."), this))
 {
   connect(m_reassignAction, SIGNAL(triggered()), SLOT(reassign()));
@@ -52,7 +52,7 @@ QList<QAction *> CustomElements::actions() const
 
 QStringList CustomElements::menuPath(QAction *) const
 {
-  return QStringList() << tr("&Edit");
+  return QStringList() << tr("&Build");
 }
 
 void CustomElements::setMolecule(QtGui::Molecule *mol)

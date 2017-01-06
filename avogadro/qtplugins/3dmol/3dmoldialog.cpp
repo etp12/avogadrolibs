@@ -23,7 +23,8 @@
 #include <avogadro/io/fileformatmanager.h>
 
 #include <string>
-#include <QtDebug>
+
+#include <QtGui/QClipboard>
 
 using Avogadro::QtGui::Molecule;
 
@@ -32,7 +33,7 @@ namespace QtPlugins {
 
 ThreeDMolDialog::ThreeDMolDialog(QtGui::Molecule *mol, QWidget *parent_)
   : QDialog(parent_),
-    m_molecule(NULL),
+    m_molecule(nullptr),
     m_ui(new Ui::ThreeDMolDialog)
 {
   m_ui->setupUi(this);
@@ -59,6 +60,9 @@ void ThreeDMolDialog::setMolecule(QtGui::Molecule *mol)
 
   connect(m_molecule, SIGNAL(changed(unsigned int)), SLOT(updateLabels()));
   connect(m_molecule, SIGNAL(destroyed()), SLOT(moleculeDestroyed()));
+  connect(m_ui->exitButton, SIGNAL(clicked()), SLOT(close()));
+  connect(m_ui->copyButton, SIGNAL(clicked()), SLOT(copyToClipboard()));
+
   updateLabels();
 }
 
@@ -109,8 +113,13 @@ void ThreeDMolDialog::updateTextBrowser()
 
 void ThreeDMolDialog::moleculeDestroyed()
 {
-  m_molecule = NULL;
+  m_molecule = nullptr;
   updateLabels();
+}
+
+void ThreeDMolDialog::copyToClipboard()
+{
+  QApplication::clipboard()->setText(m_ui->plainTextEdit->toPlainText()); 
 }
 
 } // namespace QtPlugins

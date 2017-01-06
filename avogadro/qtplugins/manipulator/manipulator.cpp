@@ -48,8 +48,8 @@ using Rendering::Identifier;
 Manipulator::Manipulator(QObject *parent_)
   : QtGui::ToolPlugin(parent_),
     m_activateAction(new QAction(this)),
-    m_molecule(NULL),
-    m_renderer(NULL),
+    m_molecule(nullptr),
+    m_renderer(nullptr),
     m_pressedButtons(Qt::NoButton)
 {
   m_activateAction->setText(tr("Manipulate"));
@@ -62,16 +62,18 @@ Manipulator::~Manipulator()
 
 QWidget *Manipulator::toolWidget() const
 {
-  return NULL;
+  return nullptr;
 }
 
 QUndoCommand * Manipulator::mousePressEvent(QMouseEvent *e)
 {
   if (!m_renderer)
-    return NULL;
+    return nullptr;
 
   updatePressedButtons(e, false);
   m_lastMousePosition = e->pos();
+  Vector2f windowPos(e->localPos().x(), e->localPos().y());
+  m_lastMouse3D = m_renderer->camera().unProject(windowPos);
 
   if (m_molecule) {
     m_molecule->setInteractive(true);
@@ -83,24 +85,24 @@ QUndoCommand * Manipulator::mousePressEvent(QMouseEvent *e)
     switch (m_object.type) {
     case Rendering::AtomType:
       e->accept();
-      return NULL;
+      return nullptr;
     default:
       break;
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 QUndoCommand * Manipulator::mouseReleaseEvent(QMouseEvent *e)
 {
   if (!m_renderer)
-    return NULL;
+    return nullptr;
 
   updatePressedButtons(e, true);
 
   if (m_object.type == Rendering::InvalidType)
-    return NULL;
+    return nullptr;
 
   if (m_molecule) {
     m_molecule->setInteractive(false);
@@ -116,26 +118,46 @@ QUndoCommand * Manipulator::mouseReleaseEvent(QMouseEvent *e)
     break;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 QUndoCommand * Manipulator::mouseMoveEvent(QMouseEvent *e)
 {
   e->ignore();
+  if (!(m_pressedButtons & Qt::LeftButton))
+    return nullptr;
+
   const Core::Molecule* mol = &m_molecule->molecule();
-  if (m_pressedButtons & Qt::LeftButton
+  Vector2f windowPos(e->localPos().x(), e->localPos().y());
+
+  if (mol->isSelectionEmpty()
       && m_object.type == Rendering::AtomType
       && m_object.molecule == mol) {
-    // Update atom position
+    // Update single atom position
     RWAtom atom = m_molecule->atom(m_object.index);
-    Vector2f windowPos(e->localPos().x(), e->localPos().y());
     Vector3f oldPos(atom.position3d().cast<float>());
     Vector3f newPos = m_renderer->camera().unProject(windowPos, oldPos);
     atom.setPosition3d(newPos.cast<double>());
-    m_molecule->emitChanged(Molecule::Atoms | Molecule::Modified);
-    e->accept();
   }
-  return NULL;
+  else if (!mol->isSelectionEmpty()) {
+    // update all selected atoms
+    Vector3f newPos = m_renderer->camera().unProject(windowPos);
+    Vector3f delta = newPos - m_lastMouse3D;
+    for (Index i = 0; i < m_molecule->atomCount(); ++i) {
+      if (!m_molecule->atomSelected(i))
+        continue;
+
+      Vector3 currentPos = m_molecule->atomPosition3d(i);
+      m_molecule->setAtomPosition3d(i, currentPos + delta.cast<double>());
+    }
+
+    // now that we've moved things, save the position
+    m_lastMouse3D = newPos;
+  }
+
+  m_molecule->emitChanged(Molecule::Atoms | Molecule::Modified);
+  e->accept();
+  return nullptr;
 }
 
 void Manipulator::updatePressedButtons(QMouseEvent *e, bool release)

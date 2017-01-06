@@ -89,7 +89,7 @@ public:
   /** \overload */
   VariantMap& dataMap();
 
-  /** Returns a vector of atomic numbers for the atoms in the moleucle. */
+  /** Returns a vector of atomic numbers for the atoms in the molecule. */
   Array<unsigned char>& atomicNumbers();
 
   /** \overload */
@@ -243,6 +243,9 @@ public:
    * Query whether the supplied atom index has been selected.
    */
   bool atomSelected(Index atomId) const;
+
+  /** Returns whether the selection is empty or not */
+  bool isSelectionEmpty() const;
 
   /** Returns a vector of pairs of atom indices of the bonds in the molecule. */
   Array<std::pair<Index, Index> >& bondPairs();
@@ -498,7 +501,7 @@ public:
   const BasisSet * basisSet() const { return m_basisSet; }
 
   /**
-   * The unit cell for this molecule. May be NULL for non-periodic structures.
+   * The unit cell for this molecule. May be nullptr for non-periodic structures.
    * @{
    */
   void setUnitCell(UnitCell *uc);
@@ -711,6 +714,15 @@ inline void Molecule::setAtomSelected(Index atomId, bool selected)
 inline bool Molecule::atomSelected(Index atomId) const
 {
   return atomId < m_selectedAtoms.size() ? m_selectedAtoms[atomId] : false;
+}
+
+inline bool Molecule::isSelectionEmpty() const
+{
+  for(Index i = 0; i < m_selectedAtoms.size(); ++i) {
+    if (m_selectedAtoms[i])
+      return false;
+  }
+  return true;
 }
 
 inline std::pair<Index, Index> Molecule::bondPair(Index bondId) const
