@@ -19,7 +19,7 @@ PQRRequest::PQRRequest(QTableWidget* tw, QLabel* gv, QLineEdit* nd, QLabel* fd, 
 
   //used to load molecule in Avogadro when downloaded
   widget = w;
-  oNetworkAccessManager = new QNetworkAccessManager(this);
+  oNetworkAccessManager = new QNetworkAccessManager(this)
 }
 
 /**
