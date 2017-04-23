@@ -112,6 +112,7 @@ add_subdirectory(navigator)
 add_subdirectory(networkdatabases)
 add_subdirectory(openbabel)
 add_subdirectory(quantumoutput)
+add_subdirectory(symmetry)
 add_subdirectory(playertool)
 add_subdirectory(povray)
 add_subdirectory(select)
@@ -126,6 +127,10 @@ if(USE_MOLEQUEUE)
   add_subdirectory(gamessinput)
   add_subdirectory(quantuminput)
   add_subdirectory(scriptfileformats)
+endif()
+
+if(USE_LIBARCHIVE)
+  add_subdirectory(plugindownloader)
 endif()
 
 # The scene plugins
